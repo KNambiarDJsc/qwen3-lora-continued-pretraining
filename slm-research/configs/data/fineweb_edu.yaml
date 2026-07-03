@@ -1,0 +1,8 @@
+# Per-dataset loader config for: fineweb_edu
+# Sample counts and weights live in mixture.yaml.
+
+hf_path: HuggingFaceFW/fineweb-edu
+split: train
+text_field: text
+streaming: true              # 1.3 TB corpus — always stream
+trust_remote_code: false

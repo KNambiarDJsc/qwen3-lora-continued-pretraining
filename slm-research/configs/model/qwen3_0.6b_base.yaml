@@ -1,0 +1,13 @@
+# Model config — see architecture spec Section 1.
+# Base checkpoint only. Do NOT point this at the Instruct/chat checkpoint.
+
+name: Qwen/Qwen3-0.6B-Base
+revision: main
+trust_remote_code: false
+torch_dtype: auto          # resolved by modeling/precision.py, see precision config below
+device_map: auto
+
+# TODO(phase 3): confirm tokenizer has no inherited <think> special tokens
+tokenizer:
+  name: Qwen/Qwen3-0.6B-Base
+  add_eos_token: true

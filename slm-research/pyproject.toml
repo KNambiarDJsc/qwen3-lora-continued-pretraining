@@ -1,0 +1,21 @@
+[project]
+name = "slm-research"
+version = "0.1.0"
+description = "SLM fine-tuning research framework — Qwen3-0.6B-Base, PEFT LoRA, continued pretraining."
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.mypy]
+python_version = "3.12"
+disallow_untyped_defs = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

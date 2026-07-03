@@ -1,0 +1,7 @@
+# See architecture spec Section 10. Fully decoupled from training config.
+batch_sizes_to_test: [1, 4, 8, 16]        # TODO(phase 8): finalize sweep matrix
+precision_modes_to_test: [bf16, fp16]
+sequence_lengths_to_test: [128, 512, 1024]
+lora_ranks_to_test: [8, 16, 32, 64]
+num_warmup_iterations: 5
+num_measured_iterations: 20

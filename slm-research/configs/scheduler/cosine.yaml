@@ -1,0 +1,3 @@
+name: cosine
+num_warmup_steps: null   # TODO(phase 3): derive from warmup_ratio x total steps
+num_training_steps: null # TODO(phase 3): derived at runtime from dataset size / batch size

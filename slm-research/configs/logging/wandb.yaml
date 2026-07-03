@@ -1,0 +1,6 @@
+# See architecture spec Section 9.
+project: slm-qwen3-0.6b-lora
+entity: null        # TODO(phase 3): your W&B entity/username
+tags: []             # populated at runtime: dataset mixture id, lora rank, precision, optimizer
+log_generation_table: true
+log_checkpoints_as_artifacts: true

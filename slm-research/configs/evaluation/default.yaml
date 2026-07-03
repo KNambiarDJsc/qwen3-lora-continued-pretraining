@@ -1,0 +1,5 @@
+# See architecture spec Section 6.
+val_split_fraction: 0.02   # TODO(phase 3): confirm holdout size per dataset
+length_buckets: [128, 256, 512, 1024, 2048]   # TODO(phase 3): align with packing sequence_length
+num_generation_samples: 8
+generation_max_new_tokens: 128

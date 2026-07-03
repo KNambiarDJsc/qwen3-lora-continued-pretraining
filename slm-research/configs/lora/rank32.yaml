@@ -1,0 +1,15 @@
+# LoRA config — rank 32 variant. See architecture spec Section 1 (lora/ group).
+
+r: 32
+alpha: 64            # 2x rank; tune per sweep in phase 6
+dropout: 0.05
+bias: none
+target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+task_type: CAUSAL_LM

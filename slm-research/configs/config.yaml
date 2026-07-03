@@ -1,0 +1,21 @@
+# Hydra root config — composes one file per group.
+# Override any group at the CLI, e.g.:
+#   python scripts/train.py lora=rank32 training=colab_t4 optimizer=adamw
+
+defaults:
+  - model: qwen3_0.6b_base
+  - data: mixture
+  - lora: rank16
+  - training: runpod_4090
+  - optimizer: paged_adamw_8bit
+  - scheduler: cosine
+  - evaluation: default
+  - benchmarking: default
+  - logging: wandb
+  - inference: default
+  - _self_
+
+run:
+  name: null        # set at runtime via run_metadata.py
+  seed: 42
+  output_dir: outputs  # run_metadata.py appends /{run.name} at runtime

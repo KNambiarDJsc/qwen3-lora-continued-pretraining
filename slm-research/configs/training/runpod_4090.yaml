@@ -1,0 +1,21 @@
+# RunPod RTX 4090 (24GB VRAM) — extends training/default.yaml.
+# Superseded configs/training/colab_t4.yaml on 2026-07-03 (see docs/architecture.md
+# Amendment Log). Replaces T4 16GB VRAM-safety-first defaults with the extra
+# headroom a 24GB card provides for a 0.6B model + LoRA (base frozen, only
+# adapter weights trainable — VRAM pressure here is far lower than a full FT).
+
+defaults:
+  - default
+
+per_device_train_batch_size: 8    # probe with torch.cuda.max_memory_allocated() to push higher
+gradient_accumulation_steps: 2    # effective batch = 16; reduce to 1 if memory allows
+precision: bf16
+gradient_checkpointing: false     # 24GB + 0.6B doesn't need this; disabling trades VRAM for speed
+dataloader_num_workers: 4         # RunPod pods ship more vCPU per GPU than Colab's shared runtime
+
+# Cost reference (checked 2026-07-03, verify at deploy time — rates change):
+#   RTX 4090 Community Cloud: ~$0.34/hr
+#   RTX 4090 Secure Cloud:    ~$0.59-0.69/hr
+#   Volume storage:           ~$0.10/GB/mo running, ~$0.20/GB/mo while stopped
+#   -> terminate (not just stop) pods between sessions unless the storage
+#      carry cost is cheaper than re-downloading the dataset mixture.

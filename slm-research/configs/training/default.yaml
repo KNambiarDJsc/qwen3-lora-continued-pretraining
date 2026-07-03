@@ -1,0 +1,15 @@
+# Base training config — environment-agnostic defaults.
+# See training/runpod_4090.yaml for hardware-specific overrides.
+
+num_epochs: 1
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+max_grad_norm: 1.0
+warmup_ratio: 0.03
+weight_decay: 0.01
+logging_steps: 10
+eval_steps: 500
+save_steps: 500
+precision: bf16               # alternatives: fp16, 4bit, 8bit — see modeling/precision.py
+gradient_checkpointing: true
+dataloader_num_workers: 0

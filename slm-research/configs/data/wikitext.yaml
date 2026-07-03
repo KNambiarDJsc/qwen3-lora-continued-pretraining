@@ -1,0 +1,9 @@
+# Per-dataset loader config for: wikitext
+# Sample counts and weights live in mixture.yaml — this file holds source-specific
+# loading parameters only (split names, text field, streaming flag overrides).
+
+hf_path: null        # TODO(phase 4): exact HF dataset repo id
+split: train
+text_field: null     # TODO(phase 4): field name containing raw text for this dataset
+streaming: false      # overridden true for openwebtext / bookcorpusopen in mixture.yaml
+trust_remote_code: false   # TODO(phase 4): verify — some legacy loading scripts require this

@@ -1,0 +1,43 @@
+# Mixture strategy — see architecture spec Section 4 and 7 (open decision #1, #3).
+# Decision: weighted proportional interleaving, packed within-dataset before mixing.
+
+sampling_strategy: proportional_interleave   # alternative: epoch_balanced
+packing_granularity: within_dataset          # alternative: across_mixture
+sequence_length: 2048
+
+sources:
+  - name: wikitext
+    config: wikitext-103-raw-v1
+    weight: null        # all null → derive proportionally from sample_count
+    sample_count: all
+  - name: openwebtext
+    weight: null
+    sample_count: 100000
+    streaming: true
+  - name: bookcorpusopen
+    weight: null
+    sample_count: 80000
+    streaming: true
+  - name: tinystories
+    weight: null
+    sample_count: 80000
+  - name: ag_news
+    weight: null
+    sample_count: all
+  - name: cnn_dailymail
+    config: "3.0.0"
+    weight: null
+    sample_count: 30000
+  - name: xsum
+    weight: null
+    sample_count: 30000
+  - name: daily_dialog
+    weight: null
+    sample_count: all
+  - name: eli5
+    weight: null
+    sample_count: 20000
+  - name: fineweb_edu
+    weight: null
+    sample_count: 100000
+    streaming: true
