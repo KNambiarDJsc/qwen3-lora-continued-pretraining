@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import Any, cast
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -27,7 +28,7 @@ def main(cfg: DictConfig) -> None:
     from slm_research.utils.config_schema import validate_config
 
     plain = OmegaConf.to_container(cfg, resolve=True)
-    root_cfg = validate_config(plain)
+    root_cfg = validate_config(cast(dict[str, Any], plain))
 
     # ------------------------------------------------------------------ #
     # 2. Seed — must happen before any model or data construction          #

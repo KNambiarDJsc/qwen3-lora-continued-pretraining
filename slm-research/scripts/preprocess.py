@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import Any, cast
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -38,9 +39,10 @@ def main(cfg: DictConfig) -> None:
     from slm_research.utils.config_schema import validate_config
 
     plain = OmegaConf.to_container(cfg, resolve=True)
-    plain.pop("checkpoint", None)
-    plain.pop("prompt", None)
-    root_cfg = validate_config(plain)
+    if isinstance(plain, dict):
+        plain.pop("checkpoint", None)
+        plain.pop("prompt", None)
+    root_cfg = validate_config(cast(dict[str, Any], plain))
 
     from datasets import Dataset, IterableDataset
 

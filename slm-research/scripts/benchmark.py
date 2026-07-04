@@ -28,7 +28,7 @@ import json
 import logging
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -43,8 +43,10 @@ def _run_single_checkpoint(cfg: DictConfig, checkpoint_path: str) -> None:
     from slm_research.utils.config_schema import validate_config
 
     plain = OmegaConf.to_container(cfg, resolve=True)
+    if not isinstance(plain, dict):
+        raise ValueError(f"Expected dict config, got {type(plain)}")
     plain.pop("checkpoint_path", None)
-    root_cfg = validate_config(plain)
+    root_cfg = validate_config(cast(dict[str, Any], plain))
 
     from slm_research.training.seed import set_seed
 

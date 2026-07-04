@@ -25,6 +25,7 @@ Run:
 from __future__ import annotations
 
 import logging
+from typing import Any, cast
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -37,9 +38,11 @@ def main(cfg: DictConfig) -> None:
     from slm_research.utils.config_schema import validate_config
 
     plain = OmegaConf.to_container(cfg, resolve=True)
+    if not isinstance(plain, dict):
+        raise TypeError("Config must resolve to a dictionary")
     plain.pop("checkpoint", None)
     plain.pop("prompt", None)
-    root_cfg = validate_config(plain)
+    root_cfg = validate_config(cast(dict[str, Any], plain))
 
     from slm_research.data.loaders import load_source_splits
 
