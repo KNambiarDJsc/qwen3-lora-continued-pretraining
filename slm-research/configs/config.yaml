@@ -19,3 +19,10 @@ run:
   name: null        # set at runtime via run_metadata.py
   seed: 42
   output_dir: outputs  # run_metadata.py appends /{run.name} at runtime
+
+# scripts/infer.py requires these at the CLI, e.g.
+#   python scripts/infer.py checkpoint=... prompt="..."
+# Declared here (rather than via `+checkpoint=`) so plain `key=value`
+# overrides work without Hydra's "append new key" syntax.
+checkpoint: null
+prompt: null
