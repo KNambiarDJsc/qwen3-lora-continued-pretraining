@@ -67,7 +67,7 @@ def test_main_preprocesses_and_saves_every_source(tmp_path, monkeypatch) -> None
 
     out_root = tmp_path / "preprocessed"
     source_names = [s.name for s in cfg.data.sources]
-    assert len(source_names) == 10
+    assert len(source_names) == 8
 
     for name in source_names:
         for split in ("train", "val"):

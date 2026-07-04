@@ -16,7 +16,7 @@ from slm_research.utils.config_schema import DataSourceConfig, MixtureConfig
 
 
 def _mixture_cfg(sources: list[DataSourceConfig], strategy: str = "proportional_interleave") -> MixtureConfig:
-    # MixtureConfig normally requires exactly 10 sources (see config_schema's
+    # MixtureConfig normally requires exactly 8 sources (see config_schema's
     # validator) — model_construct bypasses validation so tests can use a
     # small, focused source list instead.
     return MixtureConfig.model_construct(

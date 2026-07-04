@@ -2,7 +2,7 @@
 
 ## The mixture
 
-Training uses a proportionally-weighted interleave of 10 Hugging Face datasets, configured in
+Training uses a proportionally-weighted interleave of 8 Hugging Face datasets, configured in
 [`configs/data/mixture.yaml`](../configs/data/mixture.yaml):
 
 | Source | HF path | Sample count | Streaming | Val split |
@@ -14,8 +14,6 @@ Training uses a proportionally-weighted interleave of 10 Hugging Face datasets, 
 | `ag_news` | `fancyzhx/ag_news` | all | no | own (`test`) |
 | `cnn_dailymail` | `abisee/cnn_dailymail` (`3.0.0`) | 30,000 | no | own (`validation`) |
 | `xsum` | `EdinburghNLP/xsum` | 30,000 | no | own (`validation`) |
-| `daily_dialog` | `li2017dailydialog/daily_dialog` | all | no | own (`validation`) |
-| `eli5` | `eli5` | 20,000 | no | own (`validation_eli5`) |
 | `fineweb_edu` | `HuggingFaceFW/fineweb-edu` | 100,000 | yes | carved (2%) |
 
 "Own" val split means the dataset ships a pre-existing validation/test split and that's used
@@ -25,11 +23,26 @@ is sliced off the training data instead (see `data/loaders.py::load_source_split
 `weight: null` for every source means weights are derived proportionally from `sample_count`
 rather than set explicitly — see `data/mixture.py`.
 
-> **Note:** `configs/data/mixture.yaml`'s source list differs from the original architecture
-> spec (`docs/architecture.md` Section 1), which specs `yelp_review_full` as the 10th dataset.
-> `fineweb_edu` was substituted during implementation as a larger, higher-quality web-text source.
-> `configs/data/yelp_review_full.yaml` is still present on disk but is dead config — nothing reads
-> it, and there's no `yelp_review_full` adapter in `data/adapters/` or entry in `data/registry.py`.
+> **Note:** the mixture was originally 10 sources; two were dropped on 2026-07-04 because they no
+> longer load with current `datasets` versions, discovered when they failed live during a training
+> run — not a config/code bug on this repo's side, both are broken upstream:
+> - `daily_dialog` (`li2017dailydialog/daily_dialog`) only ships a legacy loading script.
+>   `datasets` >= 4.x refuses to execute loading scripts at all now
+>   (`RuntimeError: Dataset scripts are no longer supported`), and HF's datasets-server reports
+>   `is-valid=false` for it — no Parquet auto-conversion exists to fall back to.
+> - `eli5` (`eli5`) was removed from the Hub entirely — `huggingface.co/datasets/eli5` now
+>   resolves to an unrelated user's profile page, not the dataset (likely related to Reddit's API
+>   policy changes, which the underlying data depended on).
+>
+> `configs/data/{daily_dialog,eli5}.yaml`, `data/adapters/{daily_dialog,eli5}.py`, and their
+> `registry.py` entries are left in place (harmless, unused) rather than deleted, in case a working
+> replacement path appears later. `MixtureConfig.sources` now validates for exactly 8 entries
+> (`utils/config_schema.py`), and `_VALID_DATASET_NAMES` no longer includes either name.
+>
+> Separately: `fineweb_edu` itself was substituted for the original architecture spec's
+> `yelp_review_full` (`docs/architecture.md` Section 1) during implementation, as a larger,
+> higher-quality web-text source. `configs/data/yelp_review_full.yaml` is dead config from that
+> earlier swap — nothing reads it, no adapter or registry entry exists for it.
 
 ## Where dataset identity actually lives
 

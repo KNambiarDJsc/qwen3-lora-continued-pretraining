@@ -19,7 +19,7 @@ No hyperparameter is ever hardcoded in `src/`. If a value isn't in `configs/`, i
 | Group | Default | Schema | Notes |
 |---|---|---|---|
 | `model` | `qwen3_0.6b_base` | `ModelConfig` | Base checkpoint identity, tokenizer, precision/device hints |
-| `data` | `mixture` | `MixtureConfig` | The 10-dataset mixture — see the [Dataset Guide](dataset_guide.md) |
+| `data` | `mixture` | `MixtureConfig` | The 8-dataset mixture — see the [Dataset Guide](dataset_guide.md) |
 | `lora` | `rank16` | `LoRAConfig` | `rank8` / `rank16` / `rank32` / `rank64` |
 | `training` | `runpod_4090` | `TrainingConfig` | Batch size, precision, gradient checkpointing, step intervals |
 | `optimizer` | `paged_adamw_8bit` | `OptimizerConfig` | or `adamw` |

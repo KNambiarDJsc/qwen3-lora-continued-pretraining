@@ -51,6 +51,6 @@ def test_main_downloads_every_configured_source(monkeypatch) -> None:
 
     download_data.main(cfg_passthrough=cfg)
 
-    assert len(calls) == 10
+    assert len(calls) == 8
     assert "wikitext" in calls
     assert "fineweb_edu" in calls

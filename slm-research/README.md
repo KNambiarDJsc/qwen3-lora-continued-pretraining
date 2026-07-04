@@ -1,7 +1,7 @@
 # SLM Fine-Tuning Research Framework
 
 Continued pretraining (causal LM, next-token prediction) of `Qwen/Qwen3-0.6B-Base`
-via PEFT LoRA, on a curated 10-dataset language modeling mixture.
+via PEFT LoRA, on a curated 8-dataset language modeling mixture.
 
 **Status:** All planned phases implemented and every entrypoint is wired up — training, evaluation,
 benchmarking, inference, data download/preprocessing, W&B export, and the CLI are functional end
@@ -22,7 +22,7 @@ python scripts/cli.py --help
 python scripts/cli.py download-data
 python scripts/cli.py preprocess
 
-# Train (LoRA rank 16, bf16, the full 10-dataset mixture)
+# Train (LoRA rank 16, bf16, the full 8-dataset mixture)
 python scripts/cli.py train
 
 # Evaluate a saved checkpoint standalone
@@ -52,7 +52,7 @@ See `docs/architecture.md` Section 1 for the full annotated tree.
 - [`docs/developer_guide.md`](docs/developer_guide.md) — setup, tests, code style, CLI internals, known gaps
 - [`docs/training_guide.md`](docs/training_guide.md) — train / resume / evaluate / benchmark / infer
 - [`docs/benchmark_guide.md`](docs/benchmark_guide.md) — latency/throughput/memory measurement + comparison matrix
-- [`docs/dataset_guide.md`](docs/dataset_guide.md) — the 10-dataset mixture and data pipeline
+- [`docs/dataset_guide.md`](docs/dataset_guide.md) — the 8-dataset mixture and data pipeline
 - [`docs/configuration_guide.md`](docs/configuration_guide.md) — Hydra config groups and validation
 
 ## Phase Roadmap

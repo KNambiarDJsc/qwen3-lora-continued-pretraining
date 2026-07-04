@@ -20,7 +20,7 @@ python scripts/train.py
 With defaults (`lora=rank16`, `training=runpod_4090`, `optimizer=paged_adamw_8bit`,
 `scheduler=cosine`), this: validates the merged config, seeds every RNG
 (`training/seed.py`), generates a run ID + captures git hash/system info, initializes a W&B run,
-builds the 10-dataset mixture (see the [Dataset Guide](dataset_guide.md)), loads
+builds the 8-dataset mixture (see the [Dataset Guide](dataset_guide.md)), loads
 `Qwen/Qwen3-0.6B-Base` with LoRA adapters applied, and runs the training loop.
 
 Override anything at the CLI — see the [Configuration Guide](configuration_guide.md) for the full

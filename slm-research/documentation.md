@@ -9,6 +9,6 @@
 - `docs/training_guide.md` — running training/resume/early stopping, evaluation, benchmarking,
   and inference end to end.
 - `docs/benchmark_guide.md` — single-checkpoint benchmarking and the multi-run comparison matrix.
-- `docs/dataset_guide.md` — the 10-dataset mixture, where dataset identity actually lives, the
+- `docs/dataset_guide.md` — the 8-dataset mixture, where dataset identity actually lives, the
   data pipeline.
 - `docs/configuration_guide.md` — Hydra config groups, override syntax, Pydantic validation.

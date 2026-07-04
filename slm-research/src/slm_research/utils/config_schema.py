@@ -15,9 +15,14 @@ from typing import Any, Literal, Optional
 from pydantic import BaseModel, field_validator, model_validator
 
 
+# daily_dialog and eli5 are intentionally excluded — both are broken upstream
+# on HF Hub as of 2026-07-04 (daily_dialog: legacy-script-only, no longer
+# loadable; eli5: removed from the Hub entirely). See configs/data/mixture.yaml
+# and docs/dataset_guide.md. Their adapters/registry entries are left in place
+# (harmless, unused) in case a working replacement path appears later.
 _VALID_DATASET_NAMES: frozenset[str] = frozenset({
     "wikitext", "openwebtext", "bookcorpusopen", "tinystories",
-    "ag_news", "cnn_dailymail", "xsum", "daily_dialog", "eli5", "fineweb_edu",
+    "ag_news", "cnn_dailymail", "xsum", "fineweb_edu",
 })
 
 _VALID_TARGET_MODULES: frozenset[str] = frozenset({
@@ -100,8 +105,8 @@ class MixtureConfig(BaseModel):
     @field_validator("sources")
     @classmethod
     def sources_valid(cls, v: list[DataSourceConfig]) -> list[DataSourceConfig]:
-        if len(v) != 10:
-            raise ValueError(f"sources must contain exactly 10 entries, got {len(v)}")
+        if len(v) != 8:
+            raise ValueError(f"sources must contain exactly 8 entries, got {len(v)}")
         names = [s.name for s in v]
         if len(set(names)) != len(names):
             raise ValueError("Duplicate dataset names in mixture.sources")
