@@ -2,7 +2,7 @@
 name = "slm-research"
 version = "0.1.0"
 description = "SLM fine-tuning research framework — Qwen3-0.6B-Base, PEFT LoRA, continued pretraining."
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.14"  # hydra-core 1.3.x's argparse setup breaks under 3.14's argparse
 
 [tool.ruff]
 line-length = 100
