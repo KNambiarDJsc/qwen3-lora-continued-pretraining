@@ -95,7 +95,7 @@ def detect_attention_implementation() -> str:
         attn_implementation argument.
     """
     try:
-        import flash_attn  # noqa: F401
+        import flash_attn  # type: ignore # noqa: F401
         logger.info("Flash Attention 2 detected — using flash_attention_2.")
         return "flash_attention_2"
     except ImportError:

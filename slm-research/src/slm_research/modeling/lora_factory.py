@@ -14,6 +14,7 @@ Consumed by: model_factory.build_model, evaluation/evaluator.py, benchmarking/*
 from __future__ import annotations
 
 import logging
+from typing import cast
 
 from peft import LoraConfig, PeftModel, TaskType, get_peft_model, prepare_model_for_kbit_training
 from transformers import PreTrainedModel
@@ -80,7 +81,7 @@ def apply_lora(
         total / 1e6,
         100.0 * trainable / total,
     )
-    return peft_model
+    return cast(PeftModel, peft_model)
 
 
 def load_lora_checkpoint(base_model: PreTrainedModel, checkpoint_path: str) -> PeftModel:
