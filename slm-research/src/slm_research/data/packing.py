@@ -23,11 +23,22 @@ import itertools
 import logging
 from typing import Any, Generator, Union
 
-from datasets import Dataset, IterableDataset
+from datasets import Dataset, Features, IterableDataset, Sequence, Value
 
 logger = logging.getLogger(__name__)
 
 HFDataset = Union[Dataset, IterableDataset]
+
+# Explicit output schema for both packers. Without this, Arrow infers the
+# narrowest dtype that fits the *actual token values present* (e.g. int32 for
+# input_ids, int8 for an all-ones attention_mask on the Dataset path, vs. a
+# generator-based IterableDataset defaulting to int64) — two packed sources
+# can end up with silently mismatched schemas, which makes mixture.py's
+# interleave_datasets() raise when mixing a streaming and a non-streaming
+# source. int64 matches what torch/collators expect anyway.
+_PACKED_FEATURES = Features(
+    {"input_ids": Sequence(Value("int64")), "attention_mask": Sequence(Value("int64"))}
+)
 
 
 # ---------------------------------------------------------------------------
@@ -77,6 +88,7 @@ def pack_dataset(
         batch_size=group_size,
         remove_columns=dataset.column_names,
         num_proc=num_proc,
+        features=_PACKED_FEATURES,
         desc=f"Packing (seq_len={sequence_length})",
     )
 
@@ -124,6 +136,7 @@ def pack_iterable_dataset(
     return IterableDataset.from_generator(
         _stateful_pack_generator,
         gen_kwargs={"tokenized_iter": dataset, "sequence_length": sequence_length},
+        features=_PACKED_FEATURES,
     )
 
 

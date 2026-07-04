@@ -155,3 +155,52 @@ class WandbLogger:
         """Mark the W&B run as complete. Call at the end of training."""
         wandb.finish()
         logger.info("W&B run finished.")
+
+
+# ------------------------------------------------------------------
+# Offline export (report generation) — the one W&B call outside an
+# active run's lifecycle, so it's a module function, not a WandbLogger method.
+# ------------------------------------------------------------------
+
+def export_run_history(
+    project: str,
+    entity: str | None = None,
+    run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    """Pull run config/summary/history via the W&B public API.
+
+    Used by scripts/cli.py's `export` command to gather already-completed
+    runs' data for the LaTeX report (reports/latex/main.tex) — offline,
+    after training/evaluation/benchmarking, not during them. Kept in this
+    module rather than a separate one because wandb_logger.py is the sole
+    module permitted to import wandb (architecture spec Section 9).
+
+    Args:
+        project: W&B project name (see configs/logging/wandb.yaml).
+        entity: W&B entity/username. None uses the API key's default entity.
+        run_id: Export exactly one run by id. None exports every run in the project.
+
+    Returns:
+        One dict per run: run_id, name, state, config, summary, and history
+        (a list of {metric: value} dicts, one per logged step).
+    """
+    api = wandb.Api()
+    path = f"{entity}/{project}" if entity else project
+
+    runs = [api.run(f"{path}/{run_id}")] if run_id is not None else list(api.runs(path))
+
+    exported: list[dict[str, Any]] = []
+    for run in runs:
+        exported.append(
+            {
+                "run_id": run.id,
+                "name": run.name,
+                "state": run.state,
+                "config": dict(run.config),
+                "summary": dict(run.summary),
+                "history": run.history(pandas=False),
+            }
+        )
+
+    logger.info("Exported %d run(s) from %s.", len(exported), path)
+    return exported

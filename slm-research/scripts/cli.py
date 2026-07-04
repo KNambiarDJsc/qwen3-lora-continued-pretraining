@@ -110,9 +110,32 @@ def list_checkpoints(
 
 
 @app.command()
-def export() -> None:
+def export(
+    project: str = typer.Option(
+        "slm-qwen3-0.6b-lora", help="W&B project name (see configs/logging/wandb.yaml)."
+    ),
+    entity: str = typer.Option(
+        None, help="W&B entity/username. Defaults to the API key's default entity."
+    ),
+    run_id: str = typer.Option(
+        None, "--run-id", help="Export a single run by id; omit to export every run in the project."
+    ),
+    output: str = typer.Option(
+        "reports/wandb_export.json", help="Output JSON path for the exported run history."
+    ),
+) -> None:
     """Pull W&B run history via API for report/plot generation."""
-    raise NotImplementedError("Phase 9: implement W&B API export for the LaTeX report.")
+    import json
+    from pathlib import Path
+
+    from slm_research.tracking.wandb_logger import export_run_history
+
+    runs = export_run_history(project=project, entity=entity, run_id=run_id)
+
+    out_path = Path(output)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(runs, indent=2, default=str))
+    typer.echo(f"Exported {len(runs)} run(s) -> {out_path}")
 
 
 if __name__ == "__main__":

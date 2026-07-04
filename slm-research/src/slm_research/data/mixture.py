@@ -97,6 +97,20 @@ def build_mixture(
         strategy, stopping_strategy, len(packed_datasets),
     )
 
+    # interleave_datasets requires every input to be the same type, but the
+    # real mixture legitimately combines streaming sources (IterableDataset)
+    # with fully-materialized ones (Dataset) — e.g. wikitext alongside
+    # openwebtext. Normalize to IterableDataset only when the list is mixed,
+    # so an all-Dataset or all-IterableDataset mixture is untouched (and the
+    # former keeps shuffling/indexing support in DataModule).
+    has_iterable = any(isinstance(d, IterableDataset) for d in packed_datasets)
+    has_dataset = any(isinstance(d, Dataset) for d in packed_datasets)
+    if has_iterable and has_dataset:
+        logger.info("Mixture combines streaming and full sources — normalizing to IterableDataset.")
+        packed_datasets = [
+            d.to_iterable_dataset() if isinstance(d, Dataset) else d for d in packed_datasets
+        ]
+
     return interleave_datasets(
         packed_datasets,
         probabilities=probabilities,

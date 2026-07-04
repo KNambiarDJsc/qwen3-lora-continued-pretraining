@@ -123,8 +123,29 @@ def test_list_checkpoints_lists_saved_checkpoints(tmp_path) -> None:
     assert "step=10" in result.output
 
 
-def test_export_not_implemented() -> None:
-    result = runner.invoke(cli_module.app, ["export"])
+def test_export_pulls_run_history_and_writes_json(tmp_path, monkeypatch) -> None:
+    captured: dict = {}
 
-    assert result.exit_code != 0
-    assert isinstance(result.exception, NotImplementedError)
+    def fake_export_run_history(project, entity=None, run_id=None):
+        captured["project"] = project
+        captured["entity"] = entity
+        captured["run_id"] = run_id
+        return [{"run_id": "abc123", "name": "run-abc", "state": "finished", "config": {}, "summary": {}, "history": []}]
+
+    # export() imports export_run_history from slm_research.tracking.wandb_logger
+    # inside the command body — patch it at the source module.
+    import slm_research.tracking.wandb_logger as wandb_logger_module
+
+    monkeypatch.setattr(wandb_logger_module, "export_run_history", fake_export_run_history)
+
+    out_path = tmp_path / "export.json"
+    result = runner.invoke(
+        cli_module.app,
+        ["export", "--project", "my-proj", "--run-id", "abc123", "--output", str(out_path)],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert captured == {"project": "my-proj", "entity": None, "run_id": "abc123"}
+    assert out_path.exists()
+    assert "abc123" in out_path.read_text()
+    assert "Exported 1 run(s)" in result.output
