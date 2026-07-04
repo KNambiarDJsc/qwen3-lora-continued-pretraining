@@ -27,6 +27,7 @@ from torch.utils.data import DataLoader
 from transformers import get_scheduler
 
 from slm_research.data.datamodule import DataModule
+from slm_research.evaluation.evaluator import Evaluator
 from slm_research.training.checkpointing import (
     get_latest_checkpoint,
     load_training_state,
@@ -223,6 +224,13 @@ class SLMTrainer:
             self.model, optimizer, train_dl, val_dl, scheduler
         )
 
+        self.evaluator = Evaluator(
+            model=self.model,
+            val_dataloader=val_dl,
+            eval_cfg=self.root_cfg.evaluation,
+            device=self.accelerator.device,
+        )
+
         # Resume from checkpoint if requested
         if self.resume_from is not None:
             self.global_step, self.current_epoch, _ = load_training_state(
@@ -240,9 +248,7 @@ class SLMTrainer:
 
         for epoch in range(self.current_epoch, self.training_cfg.num_epochs):
             self.current_epoch = epoch
-            epoch_metrics = self._train_epoch(
-                train_dl, val_dl, optimizer, scheduler, epoch
-            )
+            epoch_metrics = self._train_epoch(train_dl, optimizer, scheduler, epoch)
             final_metrics.update(epoch_metrics)
 
             if self.early_stop_patience > 0 and should_early_stop(
@@ -278,7 +284,6 @@ class SLMTrainer:
     def _train_epoch(
         self,
         train_dl: DataLoader,
-        val_dl: DataLoader,
         optimizer: torch.optim.Optimizer,
         scheduler: Any,
         epoch: int,
@@ -355,7 +360,7 @@ class SLMTrainer:
 
                 # --- Evaluation ---
                 if self.global_step % cfg.eval_steps == 0:
-                    val_metrics = self._eval(val_dl)
+                    val_metrics = self.evaluator.evaluate(global_step=self.global_step)
                     self.wl.log(val_metrics, step=self.global_step)
                     self.val_loss_history.append(val_metrics["val/loss"])
                     logger.info(
@@ -385,31 +390,3 @@ class SLMTrainer:
                     )
 
         return last_metrics
-
-    def _eval(self, val_dl: DataLoader) -> dict[str, float]:
-        """Run one pass over the validation DataLoader.
-
-        Returns:
-            Dict with val/loss, val/ppl, val/token_loss, val/bpt.
-        """
-        self.model.eval()
-        total_loss = 0.0
-        total_batches = 0
-
-        with torch.no_grad():
-            for batch in val_dl:
-                outputs = self.model(**batch)
-                total_loss += outputs.loss.item()
-                total_batches += 1
-
-        val_loss = total_loss / max(total_batches, 1)
-        val_ppl = math.exp(min(val_loss, 20))
-        # bits per token: nats → bits
-        val_bpt = val_loss / math.log(2)
-
-        return {
-            "val/loss": val_loss,
-            "val/token_loss": val_loss,
-            "val/ppl": val_ppl,
-            "val/bpt": val_bpt,
-        }

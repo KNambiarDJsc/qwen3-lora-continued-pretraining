@@ -73,7 +73,8 @@ def load_source(
     # Apply adapter: standardize all columns to {"text": str}
     adapter = info.adapter
     if source.streaming:
-        dataset: HFDataset = raw.map(adapter, remove_columns=raw.features.keys() if hasattr(raw, "features") else None)
+        remove_columns = list(raw.features.keys()) if getattr(raw, "features", None) else None
+        dataset: HFDataset = raw.map(adapter, remove_columns=remove_columns)
         dataset = dataset.shuffle(seed=seed, buffer_size=10_000)
         if isinstance(source.sample_count, int):
             dataset = dataset.take(source.sample_count)
